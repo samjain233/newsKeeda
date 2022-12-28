@@ -1,0 +1,10 @@
+
+.navbar__bg-color
+{
+    background-color: rgba(255, 119, 0, 1);
+}
+
+.navbar-items__hover:hover{
+    background-color: #EA580C;
+    transition: 0.3s;
+}
