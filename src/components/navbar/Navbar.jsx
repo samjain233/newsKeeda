@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import "./navbar.css";
 
@@ -39,11 +40,14 @@ export class Navbar extends Component {
             </li>
             {this.state.navitems.map((element) => {
               return (
-                <a href={`/${element}`}>
-                <li className="flex px-4 py-2 cursor-pointer navbar-items__hover rounded-md">
-                  {element}
+                <li
+                  key={element}
+                  className="flex px-4 py-2 cursor-pointer navbar-items__hover rounded-md"
+                >
+                  <a href={`/${element}`} key={element}>
+                    {element}
+                  </a>
                 </li>
-                </a>
               );
             })}
           </ul>
