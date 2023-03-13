@@ -1,15 +1,18 @@
 import React, { Component } from "react";
 import Spinner from "../Spinner/Spinner";
 import Newsitem from "./Newsitem";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 export class NewsHeadline extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
       articles: [],
       loading: false,
       page: 1,
+      totalResult: 0,
     };
+    document.title = `${this.props.category.toUpperCase()} - NewsMonkey`;
   }
 
   async componentDidMount() {
@@ -32,7 +35,9 @@ export class NewsHeadline extends Component {
     this.setState({
       loading: true,
     });
-    let url = `https://newsapi.org/v2/top-headlines?country=us&category=${this.props.category}&apiKey=d362129cfcc543739f19b8e7ffd5204a&page=${
+    let url = `https://newsapi.org/v2/top-headlines?country=us&category=${
+      this.props.category
+    }&apiKey=d362129cfcc543739f19b8e7ffd5204a&page=${
       this.state.page - 1
     }&pageSize=${this.props.pageSize}`;
     let data = await fetch(url);
@@ -49,7 +54,9 @@ export class NewsHeadline extends Component {
     this.setState({
       loading: true,
     });
-    let url = `https://newsapi.org/v2/top-headlines?country=us&category=${this.props.category}&apiKey=d362129cfcc543739f19b8e7ffd5204a&page=${
+    let url = `https://newsapi.org/v2/top-headlines?country=us&category=${
+      this.props.category
+    }&apiKey=d362129cfcc543739f19b8e7ffd5204a&page=${
       this.state.page + 1
     }&pageSize=${this.props.pageSize}`;
     let data = await fetch(url);
@@ -62,43 +69,59 @@ export class NewsHeadline extends Component {
     });
   };
 
+  fetchMoreData = async () => {
+    // this.setState({
+    //   loading: true,
+    // });
+    let url = `https://newsapi.org/v2/top-headlines?country=us&category=${
+      this.props.category
+    }&apiKey=d362129cfcc543739f19b8e7ffd5204a&page=${
+      this.state.page + 1
+    }&pageSize=${this.props.pageSize}`;
+    let data = await fetch(url);
+    let parsedData = await data.json();
+    console.log(parsedData);
+    this.setState({
+      articles: this.state.articles.concat(parsedData.articles),
+      page: this.state.page + 1,
+      // loading: false,
+    });
+  };
+
   render() {
     return (
-      <div>
-        {this.state.loading && (
+      <>
+        {/* {this.state.loading && (
           <div className="flex justify-center">
             <Spinner />
           </div>
-        )}
-        {!this.state.loading && this.state.articles.map((element) => {
-          return (
-            <Newsitem
-              title={element.title}
-              description={element.description}
-              imageurl={element.urlToImage}
-            />
-          );
-        })}
-        <div className="next_prev_container">
-          <button
-            disabled={this.state.page <= 1}
-            className="bg-yellow-500 p-2 m-2"
-            onClick={this.handleprev}
-          >
-            &larr; PREVIOUS
-          </button>
-          <button
-            disabled={
-              this.state.page + 1 >
-              Math.ceil(this.state.totalResult / this.props.pageSize)
-            }
-            className="bg-green-600 p-2 m-2"
-            onClick={this.handlenext}
-          >
-            NEXT &rarr;
-          </button>
-        </div>
-      </div>
+        )} */}
+
+        <InfiniteScroll
+          dataLength={this.state.articles.length}
+          next={this.fetchMoreData}
+          hasMore={this.state.articles.length != this.totalResults}
+          loader={<Spinner />}
+        >
+          <div>
+            <div className="flex justify-center items-center ">
+              <div className="flex flex-row flex-wrap justify-left mx-[5vw]">
+                {!this.state.loading &&
+                  this.state.articles.map((element) => {
+                    return (
+                      <Newsitem
+                        title={element.title}
+                        description={element.description}
+                        imageurl={element.urlToImage}
+                        url={element.url}
+                      />
+                    );
+                  })}
+              </div>
+            </div>
+          </div>
+        </InfiniteScroll>
+      </>
     );
   }
 }
